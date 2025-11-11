@@ -1,0 +1,38 @@
+{
+  "name": "youtube-audio-converter",
+  "version": "1.0.0",
+  "description": "YouTube to Audio Converter with trimming support using yt-dlp",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:mac": "electron-builder --mac"
+  },
+  "keywords": ["youtube", "audio", "converter", "electron", "yt-dlp"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "dependencies": {
+    "fluent-ffmpeg": "^2.1.2"
+  },
+  "build": {
+    "appId": "com.youtubeaudio.converter",
+    "productName": "YouTube Audio Converter",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": ["dmg", "zip"],
+      "extendInfo": {
+        "LSEnvironment": {
+          "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        }
+      }
+    },
+    "files": [
+      "**/*",
+      "!**/*.md"
+    ],
+    "extraResources": []
+  }
+}

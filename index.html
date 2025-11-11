@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Audio Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 35px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .format-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .video-info {
+            display: none;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .video-info.active {
+            display: block;
+        }
+
+        .video-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .trim-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .trim-section h3 {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .slider-container {
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .range-slider {
+            position: relative;
+            height: 6px;
+            background: #ddd;
+            border-radius: 3px;
+            margin: 20px 0;
+        }
+
+        .range-slider input[type="range"] {
+            position: absolute;
+            width: 100%;
+            height: 6px;
+            background: transparent;
+            pointer-events: none;
+            -webkit-appearance: none;
+        }
+
+        .range-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            cursor: pointer;
+            border-radius: 50%;
+            pointer-events: auto;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .range-slider input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            cursor: pointer;
+            border-radius: 50%;
+            pointer-events: auto;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            border: none;
+        }
+
+        .range-track {
+            position: absolute;
+            height: 6px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+            pointer-events: none;
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .time-input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .time-input-group label {
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .time-display {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status.active {
+            display: block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 YouTube Audio Converter</h1>
+            <p>Download and trim audio from YouTube videos</p>
+        </div>
+
+        <div class="content">
+            <div class="input-group">
+                <label for="youtube-url">YouTube URL</label>
+                <input type="text" id="youtube-url" placeholder="https://www.youtube.com/watch?v=...">
+            </div>
+
+            <button class="btn" id="load-btn">Load Video</button>
+            <div style = "height: 15px;"></div>
+
+            <div class="video-info" id="video-info">
+                <div class="video-title" id="video-title"></div>
+                <div class="time-display">Duration: <span id="video-duration">0:00</span></div>
+            </div>
+
+            <div class="trim-section" style="display: none;" id="trim-section">
+                <h3>Trim Audio (Optional)</h3>
+                
+                <div class="slider-container">
+                    <div class="range-slider">
+                        <div class="range-track" id="range-track"></div>
+                        <input type="range" id="start-range" min="0" max="100" value="0" step="0.1">
+                        <input type="range" id="end-range" min="0" max="100" value="100" step="0.1">
+                    </div>
+                </div>
+
+                <div class="time-inputs">
+                    <div class="time-input-group">
+                        <label>Start Time (seconds)</label>
+                        <input type="number" id="start-time" min="0" step="0.1" value="0">
+                    </div>
+                    <div class="time-input-group">
+                        <label>End Time (seconds)</label>
+                        <input type="number" id="end-time" min="0" step="0.1" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="file-name">File Name</label>
+                <input type="text" id="file-name" placeholder="my-audio-file">
+            </div>
+
+            <div class="format-group">
+                <div class="input-group" style="margin: 0;">
+                    <label for="output-path">Output Location</label>
+                    <input type="text" id="output-path" placeholder="Click 'Browse' to select folder" readonly>
+                </div>
+                <div class="input-group" style="margin: 0;">
+                    <label for="format">Format</label>
+                    <select id="format">
+                        <option value="mp3">MP3</option>
+                        <option value="wav">WAV</option>
+                    </select>
+                </div>
+            </div>
+            <div style = "height: 15px;"></div>
+
+            <button class="btn btn-secondary" id="browse-btn" style="margin-bottom: 15px;">Browse Output Folder</button>
+            <button class="btn" id="download-btn" disabled>Download Audio</button>
+
+            <div class="progress-bar" id="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+
+            <div class="status" id="status"></div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
